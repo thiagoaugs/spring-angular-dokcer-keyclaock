@@ -1,0 +1,25 @@
+#groups:
+#- name: SAT-FORMS-API
+#  rules:
+#  - alert: ApiTaxaAlta
+#    expr: rate(http_request_received_total[1m]) > 1
+#    for: 30s
+#    labels:
+#      team: sat_forms_api
+#    annotations:
+#      sumary: Taxa de transferencia alta em {{labels.instance}}
+#      description: "{{labels.instance}} está com uma taxa de transferencia alta (valor: {{$value}}) "
+      
+      
+groups:
+- name: SAT-FORMS-API
+  rules:
+  - alert: APITaxaRequisicoes
+    expr: rate(http_server_requests_seconds_count{uri="/"} [5m]) > 0
+    for: 1m
+    labels:
+      severity: Alta
+      team: sat_forms_api
+    annotations:
+      summary: Aplicação recebendo muitas requisições
+#      description: "{{labels.instance}} está com uma taxa de transferencia alta (valor: {{$value}}) "

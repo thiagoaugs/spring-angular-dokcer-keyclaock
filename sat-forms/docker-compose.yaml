@@ -1,0 +1,125 @@
+version: '3.4'
+
+services:
+
+# API
+  sat-forms:
+    image: sat-forms:latest
+    container_name: sat-forms-api
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - '8181:8181'
+    networks:
+      - sat-forms-network
+      
+      
+      
+      
+# keycloak
+  keycloak:
+     image: jboss/keycloak:12.0.3
+     restart: on-failure
+    
+     volumes:
+       - keycloack:/config/
+     environment:
+       - KEYCLOAK_USER=admin
+       - KEYCLOAK_PASSWORD=admin
+       - DB_VENDOR=postgres
+       - DB_USER=admin
+       - DB_PASSWORD=admin
+       - DB_ADDR=keycloak-db
+       - DB_PORT=5432
+       - DB_DATABASE=keycloakdb
+     ports:
+       - "6081:8080"
+     depends_on:
+       - keycloak-db
+     networks:
+       - sat-forms-network 
+       
+# keycloak-db
+  keycloak-db:
+    image: postgres:10
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: keycloakdb
+    volumes:
+      - pgKeycloackData:/var/lib/postgresql/data
+    networks:
+      - sat-forms-network 
+ 
+# Prometheus 
+  prometheus:
+    image: prom/prometheus:v2.22.0
+    container_name: prometheus
+    volumes:
+      - ./env/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./env/alert-rules.yaml:/etc/prometheus/alert-rules.rules
+    ports:
+      - 3001:9090
+    networks:
+      - sat-forms-network
+   
+# Grafana
+  grafana:
+    image: grafana/grafana:7.3.3
+    container_name: grafana
+    volumes:
+      - grafanaData:/var/lib/grafana
+    ports:
+      - 3000:3000
+    env_file:
+      - ./env/grafana.env
+    networks:
+      - sat-forms-network
+      
+#alert-manager
+  alertmanager:
+    image: prom/alertmanager:v0.21.0
+    container_name: alert-manager
+    volumes:
+      - ./env/alert-manager.yaml:/prometheus/alertmanager.yml 
+    command:
+      - '--config.file=/prometheus/alertmanager.yml'
+    ports:
+      - 3002:9093
+    networks:
+      - sat-forms-network  
+    depends_on:
+      - prometheus  
+            
+#loki
+  loki:
+    image: grafana/loki:2.0.0      
+    container_name: loki
+    ports:
+      - "3003:3100"
+    command:
+      - -config.file=/etc/loki/local-config.yaml
+      - -print-config-stderr=true
+    networks:
+      - sat-forms-network  
+    depends_on:
+      - grafana
+      
+      
+# networks
+networks: 
+  sat-forms-network:
+    driver: bridge 
+       
+   
+# volumes   
+volumes:
+  pgKeycloackData:
+  keycloack:
+  grafanaData:
+ 
+ 
+      
+      
+

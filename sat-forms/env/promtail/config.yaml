@@ -1,0 +1,29 @@
+server:
+  http_listen_port: 3004
+  grpc_listen_port: 0
+
+#armazenar onde parou a leitura   
+positions:
+  filename: /tmp/positions.yaml
+  
+#client para onde vai enviar
+clients:
+  - url: http://localhost:3100/loki/api/v1/push
+  
+
+scrape_configs:
+  - job_name: system
+    static_configs:
+    - tagets:
+      - localhost
+    labels:
+      job: varlogs
+      __path__: /var/log/*log
+ 
+  - job_name: sat-forms
+    static_configs:
+    - tagets:
+      - localhost
+    labels:
+      job: api
+      __path__: /logs/api/*log

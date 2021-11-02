@@ -1,0 +1,29 @@
+global:
+route:
+  receiver: Default
+  group_by: ['alertname']  
+  group_wait: 15s
+  group_interval: 15s
+  repeat_interval: 15s
+  
+  routes:
+    - receiver: APITaxaRequisicoes
+      match:
+        team: sat_forms_api
+        
+#    - receiver: APITaxaRequisicoes
+#      match:
+#        team: sat_forms_api
+#        
+#    - receiver: APITaxaRequisicoes
+#      match:
+#        team: sat_forms_api
+
+receivers:
+- name: Default
+  webhook_configs:
+    - url: 'https://pruu.herokuapp.com/dump/wpebhookdefault'
+- name: APITaxaRequisicoes
+  webhook_configs: 
+    - url: 'https://pruu.herokuapp.com/dump/wpebhookwebapi'
+#- name: 

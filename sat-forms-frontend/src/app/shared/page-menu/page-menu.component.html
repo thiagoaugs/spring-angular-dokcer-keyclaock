@@ -1,0 +1,14 @@
+<p-megaMenu [model]="items" orientation="vertical" ></p-megaMenu>
+
+<p-menu [showTransitionOptions]="'0ms'" [hideTransitionOptions]="'0ms'" #menu [popup]="true" [model]="items2"></p-menu>
+<button type="button" pButton icon="pi pi-list" label="Show" (click)="menu.toggle($event)"></button>
+
+
+
+<p-tieredMenu [model]="items3"></p-tieredMenu>
+
+
+
+
+<p-tieredMenu [showTransitionOptions]="'0ms'" [hideTransitionOptions]="'0ms'" #menu [model]="items3" [popup]="true"></p-tieredMenu>
+<button #btn type="button" pButton icon="pi pi-fw pi-list" label="Show" (click)="menu.toggle($event)"></button>
